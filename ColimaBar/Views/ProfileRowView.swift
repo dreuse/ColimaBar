@@ -147,29 +147,25 @@ struct ProfileRowView: View {
 
     private var resourceSpecs: some View {
         let sample = appModel.resourceSamples[profile.name]
-        return HStack(spacing: 14) {
-            if let sample, let cpus = profile.cpus {
-                let used = Double(cpus) * sample.cpuPercent / 100
-                specItem(icon: "cpu", text: String(format: "%.1f / %d CPU", used, cpus))
-            } else {
-                specItem(icon: "cpu", text: profile.cpus.map { "\($0) CPU" } ?? "—")
-            }
-
+        return VStack(alignment: .leading, spacing: 4) {
             if let sample {
-                specItem(icon: "memorychip", text: String(format: "%.1f / %.0f GB", sample.memoryUsedGB, sample.memoryTotalGB))
+                HStack(spacing: 12) {
+                    specItem(icon: "cpu", text: String(format: "%.1f / %d", Double(profile.cpus ?? 0) * sample.cpuPercent / 100, profile.cpus ?? 0))
+                    specItem(icon: "memorychip", text: String(format: "%.1f / %.0f GB", sample.memoryUsedGB, sample.memoryTotalGB))
+                    specItem(icon: "internaldrive", text: String(format: "%.0f / %.0f GB", sample.diskUsedGB, sample.diskTotalGB))
+                }
             } else {
-                specItem(icon: "memorychip", text: profile.memoryGB.map { String(format: "%.0f GB", $0) } ?? "—")
+                HStack(spacing: 12) {
+                    specItem(icon: "cpu", text: profile.cpus.map { "\($0) CPU" } ?? "—")
+                    specItem(icon: "memorychip", text: profile.memoryGB.map { String(format: "%.0f GB", $0) } ?? "—")
+                    specItem(icon: "internaldrive", text: profile.diskGB.map { String(format: "%.0f GB", $0) } ?? "—")
+                }
             }
-
-            if let sample {
-                specItem(icon: "internaldrive", text: String(format: "%.0f / %.0f GB", sample.diskUsedGB, sample.diskTotalGB))
-            } else {
-                specItem(icon: "internaldrive", text: profile.diskGB.map { String(format: "%.0f GB", $0) } ?? "—")
-            }
-
-            specItem(icon: "shippingbox", text: profile.runtime.displayName)
-            if let arch = profile.arch {
-                specItem(icon: "cpu.fill", text: arch)
+            HStack(spacing: 12) {
+                specItem(icon: "shippingbox", text: profile.runtime.displayName)
+                if let arch = profile.arch {
+                    specItem(icon: "cpu.fill", text: arch)
+                }
             }
         }
         .font(.caption2)

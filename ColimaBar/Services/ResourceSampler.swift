@@ -30,14 +30,14 @@ actor ResourceSampler {
             lastCPUTotals.removeValue(forKey: profile.name)
             return nil
         }
-        guard let limactl = BinaryResolver.locate("limactl") else { return nil }
+        guard let colima = BinaryResolver.locate("colima") else { return nil }
 
         let script = "cat /proc/stat | head -n 1; free -b | awk '/^Mem:/ {print $2, $3}'; df -B1 / | awk 'NR==2 {print $2, $3}'"
 
         do {
             let output = try await runner.runChecked(
-                executableURL: limactl,
-                arguments: ["shell", profile.name, "sh", "-c", script],
+                executableURL: colima,
+                arguments: ["ssh", "-p", profile.name, "--", "sh", "-c", script],
                 timeout: 8
             )
             let parsed = parse(output: output, profileName: profile.name)
