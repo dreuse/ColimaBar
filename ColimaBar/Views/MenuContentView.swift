@@ -366,6 +366,9 @@ struct MenuContentView: View {
             .disabled(appModel.runningCount == 0)
 
             Spacer()
+            Text("v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?")")
+                .font(.caption2)
+                .foregroundStyle(.quaternary)
             Button {
                 appModel.quit()
             } label: {
