@@ -180,21 +180,23 @@ final class AppModel: ObservableObject {
             refreshInFlight = false
             isLoading = false
         }
+
+        // Profile list is the critical path — context lookups are best-effort
+        // because docker/kubectl contexts may not exist during start/stop transitions.
         do {
-            async let list = controller.listProfiles()
-            async let ctx = controller.currentContext()
-            async let kubeCtx = controller.currentKubeContext()
-            let (profiles, context, kube) = try await (list, ctx, kubeCtx)
-            self.profiles = profiles.sorted { $0.name < $1.name }
-            self.activeContext = context
-            self.activeKubeContext = kube
+            let list = try await controller.listProfiles()
+            self.profiles = list.sorted { $0.name < $1.name }
             self.lastError = nil
-            evaluateBatteryOptInBanner()
-            Task { await self.sampleResources() }
-            Task { await self.indexAllContainers() }
         } catch {
             self.lastError = Self.describe(error)
         }
+
+        self.activeContext = await controller.currentContext()
+        self.activeKubeContext = await controller.currentKubeContext()
+
+        evaluateBatteryOptInBanner()
+        Task { await self.sampleResources() }
+        Task { await self.indexAllContainers() }
     }
 
     func useKubeContext(for profile: String) {
@@ -405,16 +407,25 @@ final class AppModel: ObservableObject {
 
     private func runProfileOp(
         _ name: String,
+        timeoutSeconds: TimeInterval = 300,
         notifyOnSuccess: (@MainActor () -> Void)? = nil,
         notifyOnFailure: (@MainActor (String) -> Void)? = nil,
         _ work: @escaping @Sendable () async throws -> Void
     ) {
         inFlightProfileOps.insert(name)
         Task { @MainActor in
-            var successMessage: Bool = false
+            var succeeded = false
             do {
-                try await work()
-                successMessage = true
+                try await withThrowingTaskGroup(of: Void.self) { group in
+                    group.addTask { try await work() }
+                    group.addTask {
+                        try await Task.sleep(nanoseconds: UInt64(timeoutSeconds * 1_000_000_000))
+                        throw ProcessRunnerError.timeout("profile operation on \(name)")
+                    }
+                    try await group.next()
+                    group.cancelAll()
+                }
+                succeeded = true
             } catch {
                 let description = Self.describe(error)
                 self.lastError = description
@@ -422,7 +433,7 @@ final class AppModel: ObservableObject {
             }
             self.inFlightProfileOps.remove(name)
             await self.refresh()
-            if successMessage { notifyOnSuccess?() }
+            if succeeded { notifyOnSuccess?() }
         }
     }
 
