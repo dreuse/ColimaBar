@@ -50,15 +50,7 @@ struct MenuContentView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text("ColimaBar")
                     .font(.headline)
-                HStack(spacing: 6) {
-                    summaryChip
-                    if let context = appModel.activeContext {
-                        Text("· \(context)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
-                }
+                summaryChip
             }
             Spacer()
             Button {
