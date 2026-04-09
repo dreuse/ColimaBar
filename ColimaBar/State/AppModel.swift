@@ -17,6 +17,8 @@ final class AppModel: ObservableObject {
     @Published private(set) var allContainers: [String: [Container]] = [:]
     @Published var searchQuery: String = ""
 
+    let updateChecker = UpdateChecker()
+
     struct SearchHit: Identifiable, Hashable {
         let profile: String
         let container: Container
@@ -150,6 +152,7 @@ final class AppModel: ObservableObject {
     func onAppear() {
         guard !missingColima else { return }
         Task { await refresh() }
+        Task { await updateChecker.checkForUpdate() }
         startPolling()
     }
 

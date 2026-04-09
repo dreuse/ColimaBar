@@ -195,6 +195,9 @@ struct MenuContentView: View {
 
     private var profileList: some View {
         VStack(spacing: 6) {
+            if let version = appModel.updateChecker.availableVersion {
+                updateBanner(version: version)
+            }
             if appModel.showBatteryOptIn {
                 batteryOptInBanner
             }
@@ -241,6 +244,40 @@ struct MenuContentView: View {
     private func isActive(_ profile: ColimaProfile) -> Bool {
         guard let ctx = appModel.activeContext else { return false }
         return ctx == DockerContextCLI.contextName(for: profile.name)
+    }
+
+    private func updateBanner(version: String) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            Image(systemName: "arrow.down.circle.fill")
+                .foregroundStyle(.green)
+            VStack(alignment: .leading, spacing: 4) {
+                Text("v\(version) available")
+                    .font(.caption.weight(.semibold))
+                if let error = appModel.updateChecker.updateError {
+                    Text(error)
+                        .font(.caption2)
+                        .foregroundStyle(.red)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Button {
+                    appModel.updateChecker.performUpdate()
+                } label: {
+                    if appModel.updateChecker.isUpdating {
+                        HStack(spacing: 4) {
+                            ProgressView().controlSize(.small)
+                            Text("Updating…")
+                        }
+                    } else {
+                        Text("Update & Restart")
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
+                .disabled(appModel.updateChecker.isUpdating)
+            }
+        }
+        .padding(8)
+        .background(Color.green.opacity(0.10), in: RoundedRectangle(cornerRadius: 6))
     }
 
     private var loadingState: some View {
