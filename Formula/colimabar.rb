@@ -1,6 +1,6 @@
 cask "colimabar" do
-  version "0.3.3"
-  sha256 "9351d0040e7c41198421ad30cd258c8e317166f04aa4fd39ead0303c6ed10757"
+  version "0.3.4"
+  sha256 "c005430264e395525ada75a8386026320ca25cb15d71ea46eb248082cf8920af"
 
   url "https://github.com/dreuse/ColimaBar/releases/download/v#{version}/ColimaBar.zip"
   name "ColimaBar"
