@@ -12,6 +12,30 @@ A clean, native macOS menu bar app for managing [Colima](https://github.com/abio
 - Full light / dark theme support
 - Custom monochrome status bar glyph drawn natively — no external assets required
 
+## Install
+
+### Homebrew (recommended)
+
+```bash
+brew tap dreuse/tap
+brew install --cask colimabar
+```
+
+### Manual
+
+Download `ColimaBar.zip` from the [latest release](https://github.com/dreuse/ColimaBar/releases/latest), extract it, and drag `ColimaBar.app` to `/Applications`.
+
+On first launch, macOS Gatekeeper may block it — right-click the app and choose **Open** to allow it.
+
+### Build from source
+
+```bash
+brew install xcodegen
+git clone https://github.com/dreuse/ColimaBar.git
+cd ColimaBar
+make install
+```
+
 ## Requirements
 
 - macOS 13 Ventura or newer
