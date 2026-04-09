@@ -17,7 +17,7 @@ struct ResourceMeter: View {
     var body: some View {
         if compact {
             bar
-                .frame(width: 36, height: 3)
+                .frame(height: 3)
         } else {
             HStack(spacing: 4) {
                 Text(label)

@@ -4,7 +4,7 @@ BUILD_DIR = build
 ARCHIVE_PATH = $(BUILD_DIR)/$(APP_NAME).xcarchive
 APP_PATH = $(BUILD_DIR)/$(APP_NAME).app
 ZIP_PATH = $(BUILD_DIR)/$(APP_NAME).zip
-VERSION = $(shell /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" ColimaBar/Resources/Info.plist)
+VERSION = $(shell grep 'MARKETING_VERSION' project.yml | head -1 | sed 's/.*"\(.*\)"/\1/')
 
 .PHONY: all clean build archive zip icon xcodegen
 

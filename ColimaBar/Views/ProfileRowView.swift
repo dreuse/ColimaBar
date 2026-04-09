@@ -93,11 +93,12 @@ struct ProfileRowView: View {
     }
 
     private func compactMeters(sample: ResourceSample) -> some View {
-        HStack(spacing: 4) {
+        HStack(spacing: 3) {
             ResourceMeter(label: "", percent: sample.cpuPercent)
             ResourceMeter(label: "", percent: sample.memoryPercent)
             ResourceMeter(label: "", percent: sample.diskPercent)
         }
+        .frame(width: 80)
         .help(String(format: "CPU %.0f%% · RAM %.0f%% · Disk %.0f%%",
                      sample.cpuPercent, sample.memoryPercent, sample.diskPercent))
     }

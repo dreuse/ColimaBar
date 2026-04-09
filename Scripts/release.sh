@@ -15,7 +15,7 @@ REPO="dreuse/ColimaBar"
 BUILD_DIR="build"
 
 echo "==> Updating version to ${VERSION}"
-/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${VERSION}" ColimaBar/Resources/Info.plist
+sed -i '' "s/MARKETING_VERSION: \".*\"/MARKETING_VERSION: \"${VERSION}\"/" project.yml
 
 echo "==> Building release archive"
 make clean zip
